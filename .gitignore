@@ -1,0 +1,6 @@
+.vscode
+.cache
+.pytest_cache
+__pycache__
+out
+build
