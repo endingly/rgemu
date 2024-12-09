@@ -7,4 +7,6 @@ target_include_directories(
     INTERFACE $<INSTALL_INTERFACE:include>
 )
 
+add_subdirectory(test)
+
 copy_header_files(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/include/risa)

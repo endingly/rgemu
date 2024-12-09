@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.31.2)
 
-project(rgemu VERSION 0.0.0 LANGUAGES CXX C ASM)
+project(rgemu LANGUAGES CXX C ASM)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

@@ -9,98 +9,39 @@ concept is_support_type =
     std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>;
 
 template <is_support_type T>
-constexpr T zero;
+struct RiscvRegFile {
+  T zero;
+  T ra;
+  T sp;
+  T gp;
+  T tp;
+  T t0;
+  T t1;
+  T t2;
+  T s0;
+  T s1;
+  T a0;
+  T a1;
+  T a2;
+  T a3;
+  T a4;
+  T a5;
+  T a6;
+  T a7;
+  T s2;
+  T s3;
+  T s4;
+  T s5;
+  T s6;
+  T s7;
+  T s8;
+  T s9;
+  T s10;
+  T s11;
+  T t3;
+  T t4;
+  T t5;
+  T t6;
+};
 
-template <is_support_type T>
-constexpr T ra;
-
-template <is_support_type T>
-constexpr T sp;
-
-template <is_support_type T>
-constexpr T gp;
-
-template <is_support_type T>
-constexpr T tp;
-
-template <is_support_type T>
-constexpr T t0;
-
-template <is_support_type T>
-constexpr T t1;
-
-template <is_support_type T>
-constexpr T t2;
-
-template <is_support_type T>
-constexpr T s0;
-
-template <is_support_type T>
-constexpr T s1;
-
-template <is_support_type T>
-constexpr T a0;
-
-template <is_support_type T>
-constexpr T a1;
-
-template <is_support_type T>
-constexpr T a2;
-
-template <is_support_type T>
-constexpr T a3;
-
-template <is_support_type T>
-constexpr T a4;
-
-template <is_support_type T>
-constexpr T a5;
-
-template <is_support_type T>
-constexpr T a6;
-
-template <is_support_type T>
-constexpr T a7;
-
-template <is_support_type T>
-constexpr T s2;
-
-template <is_support_type T>
-constexpr T s3;
-
-template <is_support_type T>
-constexpr T s4;
-
-template <is_support_type T>
-constexpr T s5;
-
-template <is_support_type T>
-constexpr T s6;
-
-template <is_support_type T>
-constexpr T s7;
-
-template <is_support_type T>
-constexpr T s8;
-
-template <is_support_type T>
-constexpr T s9;
-
-template <is_support_type T>
-constexpr T s10;
-
-template <is_support_type T>
-constexpr T s11;
-
-template <is_support_type T>
-constexpr T t3;
-
-template <is_support_type T>
-constexpr T t4;
-
-template <is_support_type T>
-constexpr T t5;
-
-template <is_support_type T>
-constexpr T t6;
 };  // namespace rgemu::risa
