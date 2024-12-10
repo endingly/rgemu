@@ -1,0 +1,22 @@
+{
+    "version": 8,
+    "configurePresets": [
+        {
+            "name": "mingw-ucrt64-debug",
+            "displayName": "GCC x86_64-w64-mingw32 (ucrt64)",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "CMAKE_C_COMPILER": "${env:MSYS2_ROOT}/ucrt64/bin/gcc.exe",
+                "CMAKE_CXX_COMPILER": "${env:MSYS2_ROOT}/ucrt64/bin/g++.exe",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_TOOLCHAIN_FILE": "${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic"
+            },
+            "environment": {
+                "MSYS2_ROOT": "E:/code_tools/msys64"
+            }
+        }
+    ]
+}

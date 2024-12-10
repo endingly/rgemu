@@ -6,6 +6,9 @@ TEST(RiscIntTest, Addition) {
   using namespace rgemu::risa::base;
 
   uint5_t a = 1;
-  std::cout << "a = " << a << std::endl;
-  std::cout << sizeof(a) << std::endl;
+  uint5_t b = 2;
+
+  auto result = a & b;
+  std::cout << result << std::endl;
+  std::cout << sizeof(result) << std::endl;
 }
