@@ -2,13 +2,62 @@
 
 #include <risa/risc_int.hpp>
 
-TEST(RiscIntTest, Addition) {
+TEST(RiscIntTest, Operator) {
   using namespace rgemu::risa::base;
 
-  uint5_t a = 1;
-  uint5_t b = 2;
+  uint5_t a    = 1;
+  uint5_t b    = 2;
+  auto    flag = true;
 
-  auto result = a & b;
-  std::cout << result << std::endl;
-  std::cout << sizeof(result) << std::endl;
+  // Test bitwise operators
+  a & b;
+  a | b;
+  a ^ b;
+  ~a;
+  a << 1;
+  a >> 1;
+
+  // Test comparison operators
+  a == b;
+  b == a;
+  a != b;
+  b != a;
+  a < b;
+  b < a;
+  a <= b;
+  b <= a;
+  a > b;
+  b > a;
+  a >= b;
+  b >= a;
+
+  // Test base arithmetic operators
+  a + b;
+  a - b;
+  a* b;
+  a / b;
+  a % b;
+  a++;
+  a--;
+  ++a;
+  --a;
+  a + 1;
+  a - 1;
+  a * 1;
+  a / 1;
+  a % 1;
+  1 + a;
+  1 - a;
+  1 * a;
+  1 / a;
+  1 % a;
+
+
+
+  // test base arithmetic assignment operators
+  a += b;
+  a -= b;
+  a *= b;
+  a /= b;
+  a %= b;
 }
