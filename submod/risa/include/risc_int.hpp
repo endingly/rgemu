@@ -9,8 +9,7 @@ namespace rgemu::risa::base {
 template <int bitWidth>
 struct RiscInt {
 
-  std::bitset<bitWidth> value;
-
+  constexpr static int BIT_WIDTH = bitWidth;
   static_assert(bitWidth > 0 && bitWidth <= 64,
                 "bitWidth must be greater than 0 and less than or equal to 64");
 
@@ -29,335 +28,437 @@ struct RiscInt {
 
   using base_type = decltype(get_base_type());
 
+  constexpr static int BASE_WIDTH = sizeof(base_type) * 8;
+
   constexpr static base_type MAX_VALUE = (1ULL << bitWidth) - 1;
+
+  constexpr static base_type MASK =
+      static_cast<base_type>(~(MAX_VALUE << bitWidth));
+
+  base_type value;
+
+#pragma region constructors and init
 
   RiscInt() : value(0) {}
 
   template <std::integral T>
-  RiscInt(T val) : value(val) {}
+  RiscInt(T val) {
+    value = val & MASK;
+  }
 
-  RiscInt(std::bitset<bitWidth> val) : value(val) {}
+  RiscInt(const RiscInt& other) : value(other.value) {}
 
-  RiscInt(const RiscInt<bitWidth>& other) : value(other.value) {}
-
-  RiscInt<bitWidth>& operator=(const RiscInt<bitWidth>& other) {
+  RiscInt& operator=(const RiscInt& other) {
     value = other.value;
     return *this;
   }
 
   template <std::integral T>
-  RiscInt<bitWidth>& operator=(T val) {
-    if (val > MAX_VALUE) {
-      val = MAX_VALUE;
-    } else
-      value = val;
+  RiscInt& operator=(T val) {
+    value = val & MASK;
     return *this;
   }
 
-  RiscInt<bitWidth>& operator+=(const RiscInt<bitWidth>& other) {
-    auto result = value.to_ulong() + other.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    } else
-      value = result;
-    return *this;
+#pragma endregion
+
+#pragma region concertions
+
+  template <std::integral T>
+  operator T() const {
+    return static_cast<T>(value);
   }
 
-  RiscInt<bitWidth>& operator-=(const RiscInt<bitWidth>& other) {
-    auto result = value.to_ulong() - other.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    } else
-      value = result;
-    return *this;
+#pragma endregion
+
+#pragma region std in and out
+
+  friend std::ostream& operator<<(std::ostream& os, const RiscInt& val) {
+    os << val.value;
+    return os;
   }
 
-  RiscInt<bitWidth>& operator*=(const RiscInt<bitWidth>& other) {
-    auto result = value.to_ulong() * other.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    } else
-      value = result;
-    return *this;
+  friend std::istream& operator>>(std::istream& is, RiscInt& val) {
+    is >> val.value;
+    return is;
   }
 
-  RiscInt<bitWidth>& operator/=(const RiscInt<bitWidth>& other) {
-    if (other.value.to_ulong() == 0) {
-      throw std::runtime_error("Division by zero");
-    }
-    auto result = value.to_ulong() / other.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    } else
-      value = result;
-    return *this;
-  }
+#pragma endregion
 
-  RiscInt<bitWidth>& operator%=(const RiscInt<bitWidth>& other) {
-    if (other.value.to_ulong() == 0) {
-      throw std::runtime_error("Division by zero");
-    }
-    auto result = value.to_ulong() % other.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    } else
-      value = result;
-    return *this;
+#pragma region bitwise operators
+
+  RiscInt<bitWidth> operator~() const { return RiscInt<bitWidth>(~value); }
+
+  RiscInt<bitWidth> operator&(const RiscInt<bitWidth>& other) const {
+    return RiscInt<bitWidth>(value & other.value);
   }
 
   RiscInt<bitWidth>& operator&=(const RiscInt<bitWidth>& other) {
-    auto result = value.to_ulong() & other.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    } else
-      value = result;
+    value = value & other.value & MASK;
     return *this;
-  }
-
-  RiscInt<bitWidth>& operator|=(const RiscInt<bitWidth>& other) {
-    auto result = value.to_ulong() | other.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    } else
-      value = result;
-    return *this;
-  }
-
-  RiscInt<bitWidth>& operator^=(const RiscInt<bitWidth>& other) {
-    auto result = value.to_ulong() ^ other.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    } else
-      value = result;
-    return *this;
-  }
-
-  RiscInt<bitWidth>& operator++() {
-    auto result = value.to_ulong() + 1;
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    } else
-      value = result;
-    return *this;
-  }
-
-  RiscInt<bitWidth> operator++(int) {
-    auto result = value.to_ulong() + 1;
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  RiscInt<bitWidth>& operator--() {
-    auto result = value.to_ulong() - 1;
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    } else
-      value = result;
-    return *this;
-  }
-
-  RiscInt<bitWidth> operator--(int) {
-    auto result = value.to_ulong() - 1;
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  RiscInt<bitWidth> operator~() const {
-    auto result = RiscInt<bitWidth>(~value);
-    return result;
-  }
-
-  RiscInt<bitWidth> operator-() const {
-    auto result = -value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  RiscInt<bitWidth> operator+(const RiscInt<bitWidth>& other) const {
-    auto result = value.to_ulong() + other.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  template <std::integral T>
-  RiscInt<bitWidth> operator+(T other) const {
-    auto result = value.to_ulong() + other;
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  template <std::integral T>
-  friend RiscInt<bitWidth> operator+(T other, const RiscInt<bitWidth>& self) {
-    auto result = self.value.to_ulong() + other;
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  template <std::integral T>
-  friend RiscInt<bitWidth> operator*(T other, const RiscInt<bitWidth>& self) {
-    auto result = self.value.to_ulong() * other;
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  RiscInt<bitWidth> operator-(const RiscInt<bitWidth>& other) const {
-    auto result = value.to_ulong() - other.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  template <std::integral T>
-  friend RiscInt<bitWidth> operator-(T other, const RiscInt<bitWidth>& self) {
-    auto result = other - self.value.to_ulong();
-    if (result > MAX_VALUE)
-      result = MAX_VALUE;
-    return RiscInt<bitWidth>(result);
-  }
-
-  RiscInt<bitWidth> operator*(const RiscInt<bitWidth>& other) const {
-    auto result = value.to_ulong() * other.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  template <std::integral T>
-  RiscInt<bitWidth> operator*(T other) const {
-    auto result = value.to_ulong() * other;
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  RiscInt<bitWidth> operator/(const RiscInt<bitWidth>& other) const {
-    if (other.value.to_ulong() == 0) {
-      throw std::runtime_error("Division by zero");
-    }
-    auto result = value.to_ulong() / other.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  template <std::integral T>
-  RiscInt<bitWidth> operator/(T other) const {
-    if (other == 0) {
-      throw std::runtime_error("Division by zero");
-    }
-    auto result = value.to_ulong() / other;
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  template <std::integral T>
-  friend RiscInt<bitWidth> operator/(T other, const RiscInt<bitWidth>& self) {
-    if (self.value.to_ulong() == 0) {
-      throw std::runtime_error("Division by zero");
-    }
-    auto result = other / self.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  RiscInt<bitWidth> operator%(const RiscInt<bitWidth>& other) const {
-    if (other.value.to_ulong() == 0) {
-      throw std::runtime_error("Division by zero");
-    }
-    auto result = value.to_ulong() % other.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  template <std::integral T>
-  RiscInt<bitWidth> operator%(T other) const {
-    if (other == 0) {
-      throw std::runtime_error("Division by zero");
-    }
-    auto result = value.to_ulong() % other;
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  template <std::integral T>
-  friend RiscInt<bitWidth> operator%(T other, const RiscInt<bitWidth>& self) {
-    if (self.value.to_ulong() == 0) {
-      throw std::runtime_error("Division by zero");
-    }
-    auto result = other % self.value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
-  }
-
-  RiscInt<bitWidth> operator&(const RiscInt<bitWidth>& other) const {
-    std::bitset<bitWidth> result = (value & other.value);
-    return RiscInt<bitWidth>(result);
   }
 
   RiscInt<bitWidth> operator|(const RiscInt<bitWidth>& other) const {
-    std::bitset<bitWidth> result = (value | other.value);
-    return RiscInt<bitWidth>(result);
+    return RiscInt<bitWidth>(value | other.value);
+  }
+
+  RiscInt<bitWidth>& operator|=(const RiscInt<bitWidth>& other) {
+    value = value | other.value | MASK;
+    return *this;
   }
 
   RiscInt<bitWidth> operator^(const RiscInt<bitWidth>& other) const {
-    std::bitset<bitWidth> result = (value ^ other.value);
-    return RiscInt<bitWidth>(result);
+    return RiscInt<bitWidth>(value ^ other.value);
+  }
+
+  RiscInt<bitWidth>& operator^=(const RiscInt<bitWidth>& other) {
+    value = value ^ other.value | MASK;
+    return *this;
+  }
+
+  RiscInt<bitWidth> operator<<(const RiscInt<bitWidth>& other) const {
+    return RiscInt<bitWidth>(value
+                             << static_cast<uint32_t>(other.value & MASK));
+  }
+
+  RiscInt<bitWidth>& operator<<=(const RiscInt<bitWidth>& other) {
+    value <<= static_cast<uint32_t>(other.value & MASK);
+    return *this;
+  }
+
+  RiscInt<bitWidth> operator>>(const RiscInt<bitWidth>& other) const {
+    return RiscInt<bitWidth>(value >>
+                             static_cast<uint32_t>(other.value & MASK));
+  }
+
+  RiscInt<bitWidth>& operator>>=(const RiscInt<bitWidth>& other) {
+    value >>= static_cast<uint32_t>(other.value & MASK);
+    return *this;
+  }
+
+  // template for integer types
+  template <std::integral T>
+  RiscInt<bitWidth> operator&(T other) const {
+    return RiscInt<bitWidth>(value & other);
   }
 
   template <std::integral T>
-  RiscInt<bitWidth> operator&(T other) const {
-    std::bitset<bitWidth> result = (value & other);
-    return RiscInt<bitWidth>(result);
+  RiscInt<bitWidth>& operator&=(T other) {
+    value = value & other & MASK;
+    return *this;
   }
 
   template <std::integral T>
   RiscInt<bitWidth> operator|(T other) const {
-    std::bitset<bitWidth> result = (value | other);
-    return RiscInt<bitWidth>(result);
+    return RiscInt<bitWidth>(value | other);
+  }
+
+  template <std::integral T>
+  RiscInt<bitWidth>& operator|=(T other) {
+    value = value | other & MASK;
+    return *this;
   }
 
   template <std::integral T>
   RiscInt<bitWidth> operator^(T other) const {
-    std::bitset<bitWidth> result = (value ^ other);
+    return RiscInt<bitWidth>(value ^ other);
+  }
+
+  template <std::integral T>
+  RiscInt<bitWidth>& operator^=(T other) {
+    value = value ^ other & MASK;
+    return *this;
+  }
+
+  template <std::integral T>
+  RiscInt<bitWidth> operator<<(T other) const {
+    return RiscInt<bitWidth>(value << other);
+  }
+
+  template <std::integral T>
+  RiscInt<bitWidth>& operator<<=(T other) {
+    value = (value << other) & MASK;
+    return *this;
+  }
+
+  template <std::integral T>
+  RiscInt<bitWidth> operator>>(T other) const {
+    return RiscInt<bitWidth>(value >> other);
+  }
+
+  template <std::integral T>
+  RiscInt<bitWidth>& operator>>=(T other) {
+    value = (value >> other) & MASK;
+    return *this;
+  }
+
+#pragma endregion
+
+#pragma region arithmetic operators
+
+  // 算术运算符重载
+  auto operator+(const RiscInt<bitWidth>& other) const {
+    return value + other.value;
+  }
+
+  RiscInt<bitWidth>& operator+=(const RiscInt<bitWidth>& other) {
+    auto result = value + other.value;
+    if (result > MAX_VALUE) {
+      result = MAX_VALUE;
+    }
+    value = result;
+    return *this;
+  }
+
+  auto operator-(const RiscInt<bitWidth>& other) const {
+    auto result = value - other.value;
+    return result;
+  }
+
+  auto operator-() const { return -value; }
+
+  RiscInt<bitWidth>& operator-=(const RiscInt<bitWidth>& other) {
+    auto result = value - other.value;
+    if (result < 0) {
+      result = 0;
+    }
+    value = result;
+    return *this;
+  }
+
+  auto operator*(const RiscInt<bitWidth>& other) const {
+    return value * other.value;
+  }
+
+  RiscInt<bitWidth>& operator*=(const RiscInt<bitWidth>& other) {
+    auto result = value * other.value;
+    if (result > MAX_VALUE) {
+      result = MAX_VALUE;
+    }
+    value = result & MASK;
+    return *this;
+  }
+
+  auto operator/(const RiscInt<bitWidth>& other) const {
+    if (other.value == 0) {
+      throw std::runtime_error("division by zero");
+    }
+    auto result = value / other.value;
     return RiscInt<bitWidth>(result);
   }
 
-  RiscInt<bitWidth> operator<<(int shift) const {
-    std::bitset<bitWidth> result = (value << shift);
+  RiscInt<bitWidth>& operator/=(const RiscInt<bitWidth>& other) {
+    if (other.value == 0) {
+      throw std::runtime_error("division by zero");
+    }
+    auto result = value / other.value;
+    if (result > MAX_VALUE) {
+      result = MAX_VALUE;
+    }
+    value = result & MASK;
+    return *this;
+  }
+
+  auto operator%(const RiscInt<bitWidth>& other) const {
+    if (other.value == 0) {
+      throw std::runtime_error("division by zero");
+    }
+    return value % other.value;
+  }
+
+  RiscInt<bitWidth>& operator%=(const RiscInt<bitWidth>& other) {
+    if (other.value == 0) {
+      throw std::runtime_error("division by zero");
+    }
+    auto result = value % other.value;
+    if (result > MAX_VALUE) {
+      result = MAX_VALUE;
+    }
+    value = result & MASK;
+    return *this;
+  }
+
+  // template for integer types
+  template <std::integral T>
+  auto operator+(T other) const {
+    return value + other;
+  }
+
+  template <std::integral T>
+  friend T operator+(T other, const RiscInt<bitWidth>& val) {
+    return other + val.value;
+  }
+
+  // ++
+  RiscInt<bitWidth>& operator++() {
+    if (value == std::numeric_limits<base_type>::max()) {
+      throw std::overflow_error("Incrementing would cause overflow.");
+    }
+    ++value;
+    return *this;
+  }
+
+  RiscInt<bitWidth> operator++(int) {
+    auto result = *this;
+    ++(*this);
     return RiscInt<bitWidth>(result);
   }
 
-  RiscInt<bitWidth> operator>>(int shift) const {
-    std::bitset<bitWidth> result = (value >> shift);
-    return RiscInt<bitWidth>(result);
+  template <std::integral T>
+  RiscInt<bitWidth>& operator+=(T other) {
+    auto result = value + other;
+    if (result > MAX_VALUE) {
+      result = MAX_VALUE;
+    }
+    value = result & MASK;
+    return *this;
+  }
+
+  template <std::integral T>
+  auto operator-(T other) const {
+    auto result = value - other;
+    return result;
+  }
+
+  RiscInt<bitWidth>& operator--() {
+    if (value == 0) {
+      throw std::underflow_error("Decrementing would cause underflow.");
+    }
+    --value;
+    return *this;
+  }
+
+  RiscInt<bitWidth> operator--(int) {
+    RiscInt temp = *this;
+    --(*this);
+    return temp;
+  }
+
+  template <std::integral T>
+  friend auto operator-(T other, const RiscInt<bitWidth>& val) {
+    return other - val.value;
+  }
+
+  template <std::integral T>
+  RiscInt<bitWidth>& operator-=(T other) {
+    auto result = value - other;
+    if (result < 0) {
+      result = 0;
+    }
+    value = result & MASK;
+    return *this;
+  }
+
+  template <std::integral T>
+  auto operator*(T other) const {
+    return value * other;
+  }
+
+  template <std::integral T>
+  friend auto operator*(T other, const RiscInt<bitWidth>& val) {
+    auto result = val.value * other;
+    return result;
+  }
+
+  template <std::integral T>
+  RiscInt<bitWidth>& operator*=(T other) {
+    auto result = value * other;
+    if (result > MAX_VALUE) {
+      result = MAX_VALUE;
+    }
+    value = result & MASK;
+    return *this;
+  }
+
+  template <std::integral T>
+  auto operator/(T other) const {
+    if (other == 0) {
+      throw std::runtime_error("division by zero");
+    }
+    auto result = value / other;
+    return result;
+  }
+
+  template <std::integral T>
+  friend auto operator/(T other, const RiscInt<bitWidth>& val) {
+    if (val.value == 0) {
+      throw std::runtime_error("division by zero");
+    }
+    auto result = other / val.value;
+    return result;
+  }
+
+  template <std::integral T>
+  RiscInt<bitWidth>& operator/=(T other) {
+    if (other == 0) {
+      throw std::runtime_error("division by zero");
+    }
+    auto result = value / other;
+    if (result < 0) {
+      result = 0;
+    }
+    value = result & MASK;
+    return *this;
+  }
+
+  template <std::integral T>
+  auto operator%(T other) const {
+    if (other == 0) {
+      throw std::runtime_error("division by zero");
+    }
+    return value % other;
+  }
+
+  template <std::integral T>
+  friend auto operator%(T other, const RiscInt<bitWidth>& val) {
+    if (val.value == 0) {
+      throw std::runtime_error("division by zero");
+    }
+    auto result = other % val.value;
+    return result;
+  }
+
+  template <std::integral T>
+  RiscInt<bitWidth>& operator%=(T other) {
+    if (other == 0) {
+      throw std::runtime_error("division by zero");
+    }
+    auto result = value % other;
+    if (result > MAX_VALUE) {
+      result = MAX_VALUE;
+    }
+    value = result & MASK;
+    return *this;
+  }
+
+#pragma endregion
+
+#pragma region logical operators
+
+  // 逻辑运算符重载
+  bool operator!() const { return !value; }
+
+  bool operator&&(const RiscInt<bitWidth>& other) const {
+    return value && other.value;
+  }
+
+  bool operator||(const RiscInt<bitWidth>& other) const {
+    return value || other.value;
+  }
+
+  bool operator<(const RiscInt<bitWidth>& other) const {
+    return value < other.value;
+  }
+
+  bool operator<=(const RiscInt<bitWidth>& other) const {
+    return value <= other.value;
+  }
+
+  bool operator>(const RiscInt<bitWidth>& other) const {
+    return value > other.value;
+  }
+
+  bool operator>=(const RiscInt<bitWidth>& other) const {
+    return value >= other.value;
   }
 
   bool operator==(const RiscInt<bitWidth>& other) const {
@@ -368,52 +469,88 @@ struct RiscInt {
     return value != other.value;
   }
 
-  bool operator<(const RiscInt<bitWidth>& other) const {
-    return value.to_ulong() < other.value.to_ulong();
-  }
-
-  bool operator<=(const RiscInt<bitWidth>& other) const {
-    return value.to_ulong() <= other.value.to_ulong();
-  }
-
-  bool operator>(const RiscInt<bitWidth>& other) const {
-    return value.to_ulong() > other.value.to_ulong();
-  }
-
-  bool operator>=(const RiscInt<bitWidth>& other) const {
-    return value.to_ulong() >= other.value.to_ulong();
+  // template for integer types
+  template <std::integral T>
+  bool operator&&(T other) const {
+    return value && other;
   }
 
   template <std::integral T>
-  bool operator==(const T& other) const {
-    return value.to_ulong() == other;
+  bool operator||(T other) const {
+    return value || other;
   }
 
   template <std::integral T>
-  bool operator!=(const T& other) const {
-    return value.to_ulong() != other;
+  bool operator<(T other) const {
+    return value < other;
   }
 
   template <std::integral T>
-  bool operator<(const T& other) const {
-    return value.to_ulong() < other;
+  bool operator<=(T other) const {
+    return value <= other;
   }
 
   template <std::integral T>
-  bool operator<=(const T& other) const {
-    return value.to_ulong() <= other;
+  bool operator>(T other) const {
+    return value > other;
   }
 
   template <std::integral T>
-  bool operator>=(const T& other) const {
-    return value.to_ulong() >= other;
+  bool operator>=(T other) const {
+    return value >= other;
   }
 
-  friend std::ostream& operator<<(std::ostream&            os,
-                                  const RiscInt<bitWidth>& obj) {
-    os << obj.value.to_ulong();
-    return os;
+  template <std::integral T>
+  bool operator==(T other) const {
+    return value == other;
   }
+
+  template <std::integral T>
+  bool operator!=(T other) const {
+    return value != other;
+  }
+
+  template <std::integral T>
+  friend bool operator&&(T other, const RiscInt<bitWidth>& val) {
+    return other && val.value;
+  }
+
+  template <std::integral T>
+  friend bool operator||(T other, const RiscInt<bitWidth>& val) {
+    return other || val.value;
+  }
+
+  template <std::integral T>
+  friend bool operator<(T other, const RiscInt<bitWidth>& val) {
+    return other < val.value;
+  }
+
+  template <std::integral T>
+  friend bool operator<=(T other, const RiscInt<bitWidth>& val) {
+    return other <= val.value;
+  }
+
+  template <std::integral T>
+  friend bool operator>(T other, const RiscInt<bitWidth>& val) {
+    return other > val.value;
+  }
+
+  template <std::integral T>
+  friend bool operator>=(T other, const RiscInt<bitWidth>& val) {
+    return other >= val.value;
+  }
+
+  template <std::integral T>
+  friend bool operator==(T other, const RiscInt<bitWidth>& val) {
+    return other == val.value;
+  }
+
+  template <std::integral T>
+  friend bool operator!=(T other, const RiscInt<bitWidth>& val) {
+    return other != val.value;
+  }
+
+#pragma endregion
 };
 
 using uint3_t = RiscInt<3>;
