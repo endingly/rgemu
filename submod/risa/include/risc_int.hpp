@@ -167,11 +167,8 @@ struct RiscInt {
   }
 
   RiscInt<bitWidth> operator~() const {
-    auto result = ~value.to_ulong();
-    if (result > MAX_VALUE) {
-      result = MAX_VALUE;
-    }
-    return RiscInt<bitWidth>(result);
+    auto result = RiscInt<bitWidth>(~value);
+    return result;
   }
 
   RiscInt<bitWidth> operator-() const {
