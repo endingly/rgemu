@@ -6,6 +6,8 @@ target_include_directories(
     INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     INTERFACE $<INSTALL_INTERFACE:include>
 )
+find_package(spdlog CONFIG REQUIRED)
+target_link_libraries(risa PRIVATE spdlog::spdlog)
 
 add_subdirectory(test)
 

@@ -12,7 +12,8 @@
                 "CMAKE_CXX_COMPILER": "${env:MSYS2_ROOT}/ucrt64/bin/g++.exe",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_TOOLCHAIN_FILE": "${env:VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-                "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic"
+                "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             },
             "environment": {
                 "MSYS2_ROOT": "E:/code_tools/msys64"
