@@ -1,6 +1,11 @@
 #pragma once
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 namespace rgemu::risa {
-// static const auto logger = spdlog::create("RISA");
+struct RISA_LOG_AUTO {
+  RISA_LOG_AUTO() { spdlog::stdout_color_mt("RISA"); }
+
+  ~RISA_LOG_AUTO() { spdlog::drop("RISA"); }
 };
+};  // namespace rgemu::risa

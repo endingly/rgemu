@@ -1,5 +1,5 @@
-#include "risc_v_32_i.hpp"
-#include "risc_v_common.hpp"
+#include "base/risc_v_32_i.hpp"
+#include "base/risc_v_common.hpp"
 
 namespace rgemu::risa {
 

@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
-
-#include <risa/risc_int.hpp>
+#include <risa/base/risc_int.hpp>
 
 TEST(RiscIntTest, Operator) {
   using namespace rgemu::risa::base;

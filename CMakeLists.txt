@@ -1,11 +1,10 @@
-cmake_minimum_required(VERSION 3.31.2)
+cmake_minimum_required(VERSION 3.28.0)
 
 project(rgemu LANGUAGES CXX C ASM)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-cmake_policy(SET CMP0174 NEW)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
