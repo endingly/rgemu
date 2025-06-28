@@ -44,4 +44,7 @@ struct RiscvRegFile {
   T t6;
 };
 
+static RiscvRegFile<uint32_t> Register32;
+static uint32_t* Register32_vec = reinterpret_cast<uint32_t*>(&Register32);
+
 };  // namespace rgemu::risa
