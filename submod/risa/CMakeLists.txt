@@ -7,7 +7,7 @@ target_include_directories(
     INTERFACE $<INSTALL_INTERFACE:include>
 )
 find_package(spdlog CONFIG REQUIRED)
-target_link_libraries(risa PRIVATE spdlog::spdlog)
+target_link_libraries(risa PRIVATE spdlog::spdlog core)
 
 add_subdirectory(test)
 
