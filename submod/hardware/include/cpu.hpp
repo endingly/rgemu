@@ -11,13 +11,10 @@ struct cpu_t {
   constexpr static size_t RegNum = 32;
 
   RegType pc;                 // Program Counter
-  RegType registers[RegNum];  // Assuming a simple register file with 32 registers.
+  RegType registers[RegNum];  // General-purpose registers
   bus_t   bus;
 
-  void         initialize();
-  OpcodeLength fetch_instruction(uint64_t address);
-  void         execute_instruction(OpcodeLength instruction);
-  void         dump_registers();
+  void initialize();
 
  private:
   RegType read(uint64_t address, bus_write_size_t size);

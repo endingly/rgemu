@@ -29,12 +29,6 @@ namespace inst_set {
 using HardwareType = rgemu::risa::interface::isa_impl::HardwareType;
 using ISA_FUNC     = void (*)(HardwareType&, instruction&);
 
-static std::unordered_map<I_Type_Opcode, ISA_FUNC> I_Type_Opcode_Functions = {
-    {I_Type_Opcode::ADDI, ADDI},   {I_Type_Opcode::SLTI, SLTI},
-    {I_Type_Opcode::SLTIU, SLTIU}, {I_Type_Opcode::XORI, XORI},
-    {I_Type_Opcode::SRI, SRLI},    {I_Type_Opcode::ORI, ORI},
-    {I_Type_Opcode::ANDI, ANDI}};
-
 void ADDI(HardwareType& hardware, instruction& inst);
 void SLTI(HardwareType& hardware, instruction& inst);
 void SLTIU(HardwareType& hardware, instruction& inst);
@@ -44,6 +38,12 @@ void ANDI(HardwareType& hardware, instruction& inst);
 void SLLI(HardwareType& hardware, instruction& inst);
 void SRLI(HardwareType& hardware, instruction& inst);
 void SRAI(HardwareType& hardware, instruction& inst);
+
+static std::unordered_map<I_Type_Opcode, ISA_FUNC> I_Type_Opcode_Functions = {
+    {I_Type_Opcode::ADDI, ADDI},   {I_Type_Opcode::SLTI, SLTI},
+    {I_Type_Opcode::SLTIU, SLTIU}, {I_Type_Opcode::XORI, XORI},
+    {I_Type_Opcode::SRI, SRLI},    {I_Type_Opcode::ORI, ORI},
+    {I_Type_Opcode::ANDI, ANDI}};
 
 };  // namespace inst_set
 

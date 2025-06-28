@@ -26,9 +26,7 @@ uint64_t dram_t::read(uint64_t          address,
   }
 }
 
-void dram_t::write(uint64_t          address,
-                   dram_write_size_t size = dram_write_size_t::BYTE,
-                   uint64_t          value) {
+void dram_t::write(uint64_t address, dram_write_size_t size, uint64_t value) {
   auto start  = address - DRAM_BASE;
   auto offset = static_cast<uint64_t>(size);
 

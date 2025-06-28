@@ -38,8 +38,7 @@ struct dram_t {
   /// @param value The value to write
   /// @throws `std::out_of_range` if the address is out of bounds
   /// @note This function does not support writing more than one byte at a time
-  void write(uint64_t address, dram_write_size_t size = dram_write_size_t::BYTE,
-             uint64_t value);
+  void write(uint64_t address, dram_write_size_t size, uint64_t value);
 };
 
 };  // namespace rgemu::hardware

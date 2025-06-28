@@ -20,9 +20,7 @@ class isa_impl : public core::IISAOperations<rgemu::risa::OpCodeCell> {
 
  public:
   using RegType    = BaseType::RegType;
-  using OpCodeCell = BaseType::OpcodeLength;
   virtual void executeInstruction(OpCodeCell opcode);
-  virtual bool decodeInstruction(OpCodeCell opcode);
 
   ~isa_impl() override = default;
   isa_impl()           = default;
