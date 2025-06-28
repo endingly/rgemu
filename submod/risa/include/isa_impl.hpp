@@ -19,11 +19,16 @@ class isa_impl : public core::IISAOperations<rgemu::risa::OpCodeCell> {
   std::unique_ptr<HardwareType> hardware;
 
  public:
-  using RegType    = BaseType::RegType;
+  using RegType = BaseType::RegType;
   virtual void executeInstruction(OpCodeCell opcode);
 
   ~isa_impl() override = default;
-  isa_impl()           = default;
+  isa_impl()           = delete;
+
+  isa_impl(std::unique_ptr<HardwareType> hw) : hardware(std::move(hw)) {}
 };
+
+std::unique_ptr<isa_impl> createISA(
+    std::unique_ptr<isa_impl::HardwareType> hardware);
 
 };  // namespace rgemu::risa::interface

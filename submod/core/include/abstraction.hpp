@@ -31,7 +31,6 @@ class IISAOperations {
   using RegType                                        = RegType_;
   using OpcodeLength                                   = OpcodeLength_;
   virtual void executeInstruction(OpcodeLength opcode) = 0;
-  virtual bool decodeInstruction(OpcodeLength opcode)  = 0;
   virtual ~IISAOperations()                            = default;
 };
 

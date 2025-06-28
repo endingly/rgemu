@@ -4,6 +4,11 @@
 
 namespace rgemu::risa::interface {
 
+std::unique_ptr<isa_impl> createISA(
+    std::unique_ptr<isa_impl::HardwareType> hardware) {
+  return std::make_unique<isa_impl>(std::move(hardware));
+}
+
 void isa_impl::executeInstruction(OpCodeCell opcode) {
   risa::instruction instr(opcode);
   switch (instr.type) {

@@ -29,6 +29,8 @@ namespace inst_set {
 using HardwareType = rgemu::risa::interface::isa_impl::HardwareType;
 using ISA_FUNC     = void (*)(HardwareType&, instruction&);
 
+/* isa defined start */
+
 void ADDI(HardwareType& hardware, instruction& inst);
 void SLTI(HardwareType& hardware, instruction& inst);
 void SLTIU(HardwareType& hardware, instruction& inst);
